@@ -1,0 +1,142 @@
+---
+title: "assignment4"
+author: "Xi Cheng"
+date: "February 21, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##10.5.1
+```{r,echo=FALSE}
+library(tidyverse)
+
+
+```
+
+```{r}
+is.tibble(mtcars)
+```
+So, if we can open the data.frame with tibble, then it's a tibble data.frame. If we have to open it with as_tibble(), then it is a regular data.frame. And also, we can use is.tibble() to find out if it is a tibble or just a normal data.frame.
+
+##10.5.2
+```{r, echo=FALSE}
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```
+if we want to subset some data from regular data.frame, we have to consider about the rows and columns. However, if we use tibble, we could just consider the columns.
+##10.5.3
+
+var <- "mpg"
+var[["mpg"]]
+var %>% .$mpg
+var %>% .[["mpg"]]
+
+
+##10.5.4
+
+```{r,echo=FALSE}
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+annoying
+```
+###10.5.4.1
+```{r,echo=FALSE}
+annoying$`1`
+```
+###10.5.4.2
+```{r,echo=FALSE}
+ggplot(annoying,aes(x=`1`,y=`2`))+geom_point()
+
+```
+
+##10.5.4.3
+```{r,echo=FALSE}
+add_column(annoying, '3' = annoying$`2`/annoying$`1`)
+annoying[["3"]] <- annoying[["2"]] / annoying[["1"]]
+annoying
+```
+##10.5.4.4
+```{r,echo=F}
+annoying <- rename(annoying, one = `1`, two = `2`, three = `3`)
+annoying
+
+```
+##10.5.5
+enframe() converts named atomic vectors or lists to two-column data frames. For unnamed vectors, the natural sequence is used as name column.
+
+##10.5.6
+print.tbl_df
+
+#########################################
+#########################################
+
+#12.6.1
+```{r,echo=FALSE}
+who
+who1 <- who %>% 
+  gather(new_sp_m014:newrel_f65, key = "key", value = "cases", na.rm = TRUE)
+who1 %>% 
+  count(key)
+who2 <- who1 %>% 
+  mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
+who3 <- who2 %>% 
+  separate(key, c("new", "type", "sexage"), sep = "_")
+who3 %>% 
+  count(new)
+who4 <- who3 %>% 
+  select(-new, -iso2, -iso3)
+who5 <- who4 %>% 
+  separate(sexage, c("sex", "age"), sep = 1)
+who5
+
+```
+
+we use na.rm = T in this case is reasonable, because there are lots of NA values in the data which is useless. we can use count(cases=NA) find out the all these missing values.
+
+
+```{r}
+count(who,cases = NA)
+
+```
+
+##12.6.2
+The code will not be separated properly into the three columns new, var, and sexage.
+
+##12.6.3
+```{r,echo= F}
+select(who3, country, iso2, iso3) %>% distinct() %>% group_by(country) %>% filter(n() > 1)
+```
+
+##12.6.4
+
+```{r,echo=FALSE}
+who5 %>%
+  group_by(country, year, sex) %>%
+  filter(year > 1995) %>%
+  summarise(cases = sum(cases)) %>%
+  unite(country_sex, country, sex, remove = FALSE) %>%
+  ggplot(aes(x = year, y = cases, group = country_sex, colour = sex)) +
+  geom_line()
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
