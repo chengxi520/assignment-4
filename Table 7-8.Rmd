@@ -1,0 +1,31 @@
+---
+title: "table 7-8"
+author: "Xi Cheng"
+date: "March 14, 2018"
+output: pdf_document
+---
+
+```{r,echo=FALSE}
+library(tidyverse)
+bill <- read.csv("billboard.csv")
+
+bill <- as.tibble(bill)
+
+bill1 <- bill %>% gather(key="week",value = "rank",-year,-artist.inverted,-track,-time,-genre,-date.entered,-date.peaked)
+
+bill2 <- bill1 %>% select(year,artist=artist.inverted,time,track,date=date.entered,week,rank)
+
+bill3 <- bill2 %>% arrange(artist)
+
+bill4 <- bill3 %>% filter(!is.na(rank))
+
+bill5 <- bill4 %>% separate(week,into=c("A","B","C"),sep=c(1,-7),convert = T)
+
+bill6 <- bill5 %>% select(-C,-A) %>% rename(week=B)
+
+bill7 <- bill6 %>% mutate(date=as.Date(date)+(week-1)*7)
+
+bill7
+
+
+```
